@@ -4,7 +4,7 @@ import boto3
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 
-bucket = 'serverless-poc-logit-model'
+bucket = 'serverless-poc-models'
 path = r'C:\workspace\serverless\serverless-poc\poc-logit-model'
 file = 'admission.rds'
 
