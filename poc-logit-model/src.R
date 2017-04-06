@@ -10,3 +10,4 @@ fit <- glm(admit ~ ., data = data, family = "binomial")
 saveRDS(fit, "admission.rds")
 
 
+fit <- readRDS('admission.rds')
