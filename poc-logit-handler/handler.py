@@ -44,7 +44,7 @@ def download_file(bucket, key):
     # caching strategies used to avoid the download of the model file every time from S3
     file_name = get_file_path(key, name_only=True)
     file_path = get_file_path(key, name_only=False)
-    if os.path.isfile(key):
+    if os.path.isfile(file_path):
         logging.debug('{} already downloaded'.format(file_name))
         return
     else:
