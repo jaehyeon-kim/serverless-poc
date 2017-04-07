@@ -18,11 +18,11 @@ logging.getLogger().setLevel(logging.DEBUG)
 #         ctypes.cdll.LoadLibrary(os.path.join('lib', file))
 #  
 # # set R environment variables
-# os.environ["R_HOME"] = os.getcwd()
-# os.environ["R_LIBS"] = os.path.join(os.getcwd(), 'site-library')
+os.environ["R_HOME"] = os.getcwd()
+os.environ["R_LIBS"] = os.path.join(os.getcwd(), 'site-library')
 
 # windows only
-os.environ["R_USER"] = r'C:\Users\jaehyeon'
+# os.environ["R_USER"] = r'C:\Users\jaehyeon'
 
 import rpy2
 from rpy2 import robjects
