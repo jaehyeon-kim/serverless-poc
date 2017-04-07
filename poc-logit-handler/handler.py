@@ -33,16 +33,24 @@ BUCKET = 'serverless-poc-models'
 KEY = 'admission.rds'
 s3 = boto3.client('s3')
 
+def get_file_path(key, name_only=True):
+    file_name = key.split('/')[len(key.split('/'))-1]
+    if name_only:
+        return file_name
+    else:
+        return '/tmp/' + file_name
+
 def download_file(bucket, key):
     # caching strategies used to avoid the download of the model file every time from S3
-    file_name = key.split('/')[len(key.split('/'))-1]
+    file_name = get_file_path(key, name_only=True)
+    file_path = get_file_path(key, name_only=False)
     if os.path.isfile(key):
         logging.debug('{} already downloaded'.format(file_name))
         return
     else:
-        logging.debug('attempt to download {}'.format(file_name))
+        logging.debug('attempt to download model object to {}'.format(file_path))
         try:
-            s3.download_file(bucket, key, file_name)
+            s3.download_file(bucket, key, file_path)
         except Exception as e:
             logging.error('error downloading key {} from bucket {}'.format(key, bucket))
             logging.error(e)
@@ -53,7 +61,8 @@ def pred_admit(gre, gpa, rnk, bucket=BUCKET, key=KEY):
     r.assign('gre', gre)
     r.assign('gpa', gpa)
     r.assign('rank', rnk)
-    r('fit <- readRDS("{}")'.format(key))
+    mod_path = get_file_path(key, name_only=False)
+    r('fit <- readRDS("{}")'.format(mod_path))
     r('newdata <- data.frame(gre=as.numeric(gre),gpa=as.numeric(gpa),rank=rank)')
     r('pred <- predict(fit, newdata=newdata, type="response")')    
     return robjects.r('pred')[0] > 0.5
