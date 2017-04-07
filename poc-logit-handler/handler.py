@@ -71,7 +71,7 @@ def lambda_handler(event, context):
         logging.error('Error: {0}'.format(e.message))        
         err = {
             'errorType': type(e).__name__, 
-            'httpStatus': 500, 
+            'httpStatus': 400, 
             'request_id': context.aws_request_id, 
             'message': e.message.replace('\n', ' ')
             }
