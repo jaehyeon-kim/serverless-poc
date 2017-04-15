@@ -4,3 +4,4 @@
 .metadata
 *.Rhistory
 *.Rproj.user
+*node_modules
