@@ -73,7 +73,14 @@ def lambda_handler(event, context):
         gpa = event["gpa"]
         rnk = event["rank"]        
         can_be_admitted = pred_admit(gre, gpa, rnk)
-        res = {"result": can_be_admitted}
+        res = {
+            "httpStatus": 200,
+            "headers": {
+                "Access-Control-Allow-Origin" : "*",
+                "Access-Control-Allow-Credentials" : True
+            },
+            "body": {"result": can_be_admitted}
+        }
         return res
     except Exception as e:
         logging.error('Payload: {0}'.format(event))
