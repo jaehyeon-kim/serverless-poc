@@ -57,7 +57,7 @@ class ResultModal extends React.Component {
 export class Admit extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { gre: 800, gpa:4.0, rank: "1", result: undefined, showModal: false}
+        this.state = { gre: 800, gpa:4.0, rank: "1", result: 'init', showModal: false}
         this.handleGREChange = this.handleGREChange.bind(this)
         this.handleGPAChange = this.handleGPAChange.bind(this)
         this.handleRankChange = this.handleRankChange.bind(this)
@@ -78,6 +78,8 @@ export class Admit extends React.Component {
     getResultString(result) {
         if (result == null) {
             return "Please try again!!"
+        } else if (result == "init") {
+            return "Processing..."
         } else {
             return (result ? "Congratulations! Expected status is PASS!!" : "Oops! Expected status is FAIL!!")
         }
@@ -98,19 +100,18 @@ export class Admit extends React.Component {
         }
     }
     getAdmit(event) {
-        event.preventDefault()
-        //console.log("IN getAdmit()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank, " Result: ", this.state.result)
+        this.setState({result:'init'})
         let baseUrl = 'https://api.jaehyeon.me/poc/admit'
         let reqUrl = baseUrl + '?gre=' + this.state.gre + '&gpa=' + this.state.gpa + '&rank=' + this.state.rank
         fetch(reqUrl, {
             headers: {
-                'x-api-key': ''
+                'x-api-key': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
             }
         })
         .then((response)=>{return response.json()})
         .then((data) =>{this.setState({result:data.body.result})})
+        .catch((error) => this.setState({result:null}))
 
-        this.sleep(2000)
         this.modalOpen()
     }
     modalOpen() {
@@ -120,7 +121,6 @@ export class Admit extends React.Component {
         this.setState({ showModal: false })
     }
     render() {
-        //console.log("IN render()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank, " Result: ", this.state.result)
         return(
             <div className="container">
                 <div className="row">
