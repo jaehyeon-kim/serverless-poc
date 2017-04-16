@@ -1,8 +1,6 @@
 const React = require('react')
 const PropTypes = require('prop-types')
 const { Link } = require('react-router')
-const { fetch } = require('isomorphic-fetch')
-import 'es6-promise';
 
 export class Content extends React.Component {
     render() {
@@ -40,7 +38,7 @@ export function About() {
 export class Admit extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { gre: 0, gpa:0.0, rank: "4", result: undefined}
+        this.state = { gre: 800, gpa:4.0, rank: "1", result: false, ip: undefined}
         this.handleGREChange = this.handleGREChange.bind(this)
         this.handleGPAChange = this.handleGPAChange.bind(this)
         this.handleRankChange = this.handleRankChange.bind(this)
@@ -58,55 +56,67 @@ export class Admit extends React.Component {
     }
     handleGREChange(event) {
         this.setState({gre: this.getInputValue(event.target.value, 0, 800)})
-        console.log("gre: ", this.state.gre)
     }
     handleGPAChange(event) {
         this.setState({gpa: this.getInputValue(event.target.value, 0, 4)})
-        console.log("gpa: ", this.state.gpa)
     }
     handleRankChange(event) {        
         this.setState({rank: event.target.value})
-        console.log("rank: ", this.state.rank)
     }
     getAdmit(event) {
         event.preventDefault()
+        //console.log("IN getAdmit()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank)
         let baseUrl = 'https://api.jaehyeon.me/poc/admit'
-        let reqUrl = baseUrl + '&gre=' + this.state.gre + '&gpa=' + this.state.gpa + '&rank=' + this.state.rank
-        console.log(reqUrl)
+        let reqUrl = baseUrl + '?gre=' + this.state.gre + '&gpa=' + this.state.gpa + '&rank=' + this.state.rank
         fetch(reqUrl, {
             headers: {
                 'x-api-key': ''
             }
         })
         .then((response)=>{return response.json()})
-        .then((data) =>{this.setState({result:data.result})})
-        console.log("result: ", this.state.result)
+        .then((data) =>{this.setState({result:data.body.result})})
+
+        fetch('https://3wac2x11d4.execute-api.us-east-1.amazonaws.com/prod/my-ip')
+        .then((response)=>{return response.json()})
+        .then((data) =>{this.setState({ip:data.body.myip})})
     }
     render() {
+        //console.log("IN render()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank)
         return(
             <div className="container">
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="gre">GRE:</label>
-                        <input type="number" className="form-control" id="gre" value={this.state.gre} onChange={this.handleGREChange} name="gre" min="0" max="800" step="1" />
+                <div className="row">
+                    <div className="col-md-4">
+                        <form>
+                            <div className="form-group">
+                                <label htmlFor="gre">GRE:</label>
+                                <input type="number" className="form-control" id="gre" value={this.state.gre} onChange={this.handleGREChange} name="gre" min="0" max="800" step="1" />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="gpa">GPA:</label>
+                                <input type="number" className="form-control" id="gpa" value={this.state.gpa} onChange={this.handleGPAChange} name="gpa" min="0" max="4" step="0.1" />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="rank">Rank:</label>
+                                <select className="form-control" id="rank" value={this.state.rank} onChange={this.handleRankChange}>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <button type="submit" className="btn btn-default" onClick={this.getAdmit}>Check!</button>
+                            </div>
+                        </form>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="gpa">GPA:</label>
-                        <input type="number" className="form-control" id="gpa" value={this.state.gpa} onChange={this.handleGPAChange} name="gpa" min="0" max="4" step="0.1" />
+                    <div className="col-md-4">
+                        <h1>Result: {(this.state.result ? "passed": "failed")}</h1>
+                        <hr/>
+                        <p>GRE: {this.state.gre}</p>
+                        <p>GPA: {this.state.gpa}</p>
+                        <p>RANK: {this.state.rank}</p>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="rank">Rank:</label>
-                        <select className="form-control" id="rank" value={this.state.rank} onChange={this.handleRankChange}>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <button type="submit" className="btn btn-default" onClick={this.getAdmit}>Check!</button>
-                    </div>
-                </form>
+                </div>
             </div>
         )
     }
