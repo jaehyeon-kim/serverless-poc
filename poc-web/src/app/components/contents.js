@@ -1,6 +1,7 @@
 const React = require('react')
 const PropTypes = require('prop-types')
 const { Link } = require('react-router')
+const { Button, Modal } = require('react-bootstrap')
 
 export class Content extends React.Component {
     render() {
@@ -35,14 +36,34 @@ export function About() {
     )
 }
 
+class ResultModal extends React.Component {
+    constructor(props) {
+        super(props)
+    }
+    getInitialState() {
+        return { showModal: false };
+    }
+    close() { this.setState({ showModal: false }) }
+    open() { this.setState({ showModal: true }) }
+    render() {
+        return(
+            <div>
+                
+            </div>
+        )
+    }
+}
+
 export class Admit extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { gre: 800, gpa:4.0, rank: "1", result: false, ip: undefined}
+        this.state = { gre: 800, gpa:4.0, rank: "1", result: undefined, showModal: false}
         this.handleGREChange = this.handleGREChange.bind(this)
         this.handleGPAChange = this.handleGPAChange.bind(this)
         this.handleRankChange = this.handleRankChange.bind(this)
         this.getAdmit = this.getAdmit.bind(this)
+        this.modalOpen = this.modalOpen.bind(this)
+        this.modalClose = this.modalClose.bind(this)
     }
     getInputValue(val, min, max) {
         let numVal = Number(val)
@@ -54,6 +75,13 @@ export class Admit extends React.Component {
             return min;
         }
     }
+    getResultString(result) {
+        if (result == null) {
+            return "Please try again!!"
+        } else {
+            return (result ? "Congratulations! Expected status is PASS!!" : "Oops! Expected status is FAIL!!")
+        }
+    }
     handleGREChange(event) {
         this.setState({gre: this.getInputValue(event.target.value, 0, 800)})
     }
@@ -63,9 +91,15 @@ export class Admit extends React.Component {
     handleRankChange(event) {        
         this.setState({rank: event.target.value})
     }
+    sleep(milliseconds) {
+        let start = new Date().getTime()
+        for (let i=0; i<1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds) break;
+        }
+    }
     getAdmit(event) {
         event.preventDefault()
-        //console.log("IN getAdmit()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank)
+        //console.log("IN getAdmit()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank, " Result: ", this.state.result)
         let baseUrl = 'https://api.jaehyeon.me/poc/admit'
         let reqUrl = baseUrl + '?gre=' + this.state.gre + '&gpa=' + this.state.gpa + '&rank=' + this.state.rank
         fetch(reqUrl, {
@@ -75,9 +109,18 @@ export class Admit extends React.Component {
         })
         .then((response)=>{return response.json()})
         .then((data) =>{this.setState({result:data.body.result})})
+
+        this.sleep(2000)
+        this.modalOpen()
+    }
+    modalOpen() {
+        this.setState({ showModal: true })
+    }
+    modalClose() {
+        this.setState({ showModal: false })
     }
     render() {
-        //console.log("IN render()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank)
+        //console.log("IN render()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank, " Result: ", this.state.result)
         return(
             <div className="container">
                 <div className="row">
@@ -101,19 +144,28 @@ export class Admit extends React.Component {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <button type="submit" className="btn btn-default" onClick={this.getAdmit}>Check!</button>
+                                <button type="button" className="btn btn-default" onClick={this.getAdmit}>Check!</button>
+                                <Modal show={this.state.showModal} onHide={this.modalClose}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Predicted admission status</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        <h3>{this.getResultString(this.state.result)}</h3>
+                                        <hr />
+                                        <p>GRE: {this.state.gre}</p>
+                                        <p>GPA: {this.state.gpa}</p>
+                                        <p>RANK: {this.state.rank}</p>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button onClick={this.modalClose}>Close</Button>
+                                    </Modal.Footer>
+                                </Modal>
                             </div>
                         </form>
-                    </div>
-                    <div className="col-md-4">
-                        <h1>Result: {(this.state.result ? "passed": "failed")}</h1>
-                        <hr/>
-                        <p>GRE: {this.state.gre}</p>
-                        <p>GPA: {this.state.gpa}</p>
-                        <p>RANK: {this.state.rank}</p>
                     </div>
                 </div>
             </div>
         )
     }
 }
+

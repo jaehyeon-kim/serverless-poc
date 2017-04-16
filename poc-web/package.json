@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build",
-    "build": "webpack -d && cp src/index.html dist/index.html && cp -r src/css dist/css && webpack-dev-server --content-base src/ --inline --hot --port 9090",
-    "build:prod": "webpack -p && cp src/index.html dist/index.html && cp -r src/css dist/css"
+    "build": " rm -rf dist && mkdir dist && webpack -d && cp src/index.html dist/index.html && cp -r src/css dist/css && webpack-dev-server --content-base src/ --inline --hot --port 9292",
+    "build:prod": "rm -rf dist && mkdir dist && webpack -p && cp src/index.html dist/index.html && cp -r src/css dist/css"
   },
   "keywords": [
     "React"
@@ -17,6 +17,7 @@
     "history": "^2.1.2",
     "prop-types": "^15.5.8",
     "react": "^15.4.2",
+    "react-bootstrap": "^0.30.8",
     "react-dom": "^15.4.2",
     "react-router": "^2.8.1"
   },
