@@ -75,10 +75,6 @@ export class Admit extends React.Component {
         })
         .then((response)=>{return response.json()})
         .then((data) =>{this.setState({result:data.body.result})})
-
-        fetch('https://3wac2x11d4.execute-api.us-east-1.amazonaws.com/prod/my-ip')
-        .then((response)=>{return response.json()})
-        .then((data) =>{this.setState({ip:data.body.myip})})
     }
     render() {
         //console.log("IN render()\nGRE: ", this.state.gre, " GPA: ", this.state.gpa, " RANK: ", this.state.rank)
